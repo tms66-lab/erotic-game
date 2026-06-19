@@ -1,0 +1,15 @@
+You must run the following command to log in: `vercel login`. Run it without --non-interactive to complete sign-in in your browser.
+{
+  "status": "action_required",
+  "reason": "login_required",
+  "action": "login_required",
+  "message": "You must run the following command to log in: `vercel login`. Run it without --non-interactive to complete sign-in in your browser.",
+  "hint": "Run this command to log in: vercel login",
+  "verification_uri": "https://vercel.com/login",
+  "next": [
+    {
+      "command": "vercel login",
+      "when": "to log in"
+    }
+  ]
+}
