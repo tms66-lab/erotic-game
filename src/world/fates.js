@@ -31,7 +31,7 @@ export const FATES = [
   },
   {
     month: 'AOÛT', title: 'Forgeron de légendes', gift: 'Marteau tiède', luck: 3,
-    text: 'Tout ce que tu forges devient légendaire. Même les cuillères. Surtout les cuillères.',
+    text: 'Tout ce que tu forges devient légendaire. Surtout les cuillères.',
   },
   {
     month: 'SEPTEMBRE', title: 'Lecteur de cartes', gift: 'Carte inachevée', luck: 4,

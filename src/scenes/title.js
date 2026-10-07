@@ -4,6 +4,7 @@ import { drawBackdrop } from './backdrop.js';
 import { FateScene } from './fate.js';
 import { World } from './world.js';
 import { ListMenu } from './ui.js';
+import { playMusic, sfx } from '../audio/sound.js';
 
 export class TitleScene {
   constructor(game) {
@@ -11,6 +12,7 @@ export class TitleScene {
     this.time = 0;
     this.save = loadSave();
     this.menu = null;
+    playMusic('night');
   }
 
   openMenu() {
@@ -32,7 +34,7 @@ export class TitleScene {
   update(dt) {
     this.time += dt;
     const input = this.game.input;
-    if (input.pressed('a') || input.pressed('start')) this.openMenu();
+    if (input.pressed('a') || input.pressed('start')) { sfx('confirm'); this.openMenu(); }
   }
 
   draw(g) {

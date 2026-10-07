@@ -5,6 +5,8 @@ import { hash } from '../gfx/tiles.js';
 import { FATES } from '../world/fates.js';
 import { Dialogue, ListMenu } from './ui.js';
 import { World } from './world.js';
+import { SKILLS } from '../world/skills.js';
+import { sfx } from '../audio/sound.js';
 
 // « Trouve ton mois. Accepte ton destin. Pas de reroll. »
 export class FateScene {
@@ -21,8 +23,8 @@ export class FateScene {
   update(dt) {
     this.time += dt;
     const input = this.game.input;
-    if (input.pressed('left') || input.pressed('up')) this.index = (this.index + 11) % 12;
-    if (input.pressed('right') || input.pressed('down')) this.index = (this.index + 1) % 12;
+    if (input.pressed('left') || input.pressed('up')) { this.index = (this.index + 11) % 12; sfx('select'); }
+    if (input.pressed('right') || input.pressed('down')) { this.index = (this.index + 1) % 12; sfx('select'); }
     if (input.pressed('a')) this.confirm();
   }
 
@@ -71,8 +73,8 @@ export class FateScene {
     g.text('>', W - 18 + nudge, 62, 'uiBorder');
     g.text(f.month, W / 2, 62, 'uiText', { align: 'center' });
 
-    g.panel(8, 80, W - 16, 140);
-    let y = 90;
+    g.panel(8, 78, W - 16, 148);
+    let y = 86;
     for (const line of wrap(f.title, 19)) {
       g.text(line, W / 2, y, 'uiBorder', { align: 'center' });
       y += 11;
@@ -83,14 +85,18 @@ export class FateScene {
     g.text('Don :', 16, y, 'uiDim');
     y += 11;
     g.text(f.gift, 16, y, 'uiAccent');
-    y += 16;
+    y += 11;
+    g.text('Combat :', 16, y, 'uiDim');
+    y += 11;
+    g.text(SKILLS[this.index].name, 16, y, 'uiBorder');
+    y += 14;
     for (const line of wrap(f.text, 19)) {
       g.text(line, 16, y, 'uiText');
-      y += 11;
+      y += 10;
     }
 
     if (!this.game.overlays.length && Math.floor(this.time * 2) % 2 === 0) {
-      g.text('A : ACCEPTER', W / 2, 226, 'uiText', { align: 'center' });
+      g.text('A : ACCEPTER', W / 2, 230, 'uiText', { align: 'center' });
     }
   }
 }

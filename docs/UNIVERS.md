@@ -87,3 +87,19 @@ immobile, une auberge.
 2. Explorer Halte-Lanterne, de jour comme de nuit.
 3. Trouver les 3 pages du Carnet (deux dehors, une à l'auberge).
 4. Les montrer à Odile : la route du Nord s'ouvre (fin de la démo).
+
+## Les Profondeurs (jouable)
+
+Sous le lac, par le vieux puits de la Halte. Dix étages qui changent à chaque descente :
+
+| Étages | Strate | Monstres |
+|---|---|---|
+| 1–3 | Les Racines | Gluet, Rongeracine, Lueur perdue |
+| 4–6 | Forêt-Champignon | Chapeautin, Spore-Mère, le Gros Doux |
+| 7–9 | Cavernes de Cristal | Prismoeil, Golem de quartz, Écho |
+| 10 | Le Noyau | **Le Glas** (boss) |
+
+Rare partout : *Un caillou*. Il ne fait rien. Il rapporte beaucoup d'XP. Mousse refuse de le frapper.
+
+Le Glas est la Cloche sous le lac. Son œil est ouvert depuis mille ans. À mi-vie, il sonne le treizième coup.
+Le don de Novembre (Clé sans serrure) y trouve enfin sa serrure.

@@ -5,6 +5,17 @@ RPG mobile en pixel art, jouable dans le navigateur (portrait, manette tactile).
 
 L'univers est décrit dans [`docs/UNIVERS.md`](docs/UNIVERS.md).
 
+## Le jeu
+
+1. **Choisis ton mois de naissance** : il te donne un titre, un don et ton **attaque spéciale** en combat (12 différentes).
+2. **Halte-Lanterne** : village avec cycle jour/nuit. La nuit, Nyx tient boutique. L'auberge de Maëlle soigne (10 or).
+3. **Le vieux puits** descend dans **les Profondeurs** : 10 étages générés au hasard (Racines, Forêt-Champignon, Cavernes de Cristal), dans le noir, avec coffres, fontaines bénies ou maudites, et 9 monstres + 1 rare.
+4. **Combats au tour par tour avec timing** : vise le centre de la jauge pour un coup parfait, appuie sur A au « ! » pour parer.
+5. **Étage 10, le Noyau** : le Glas, la cloche sous le lac. Le vaincre fait taire le lac (fin du chapitre).
+6. Verdicts **VIT / MEURT / MAUDIT**, montée de niveau, Mousse qui se bat avec toi, chiptune généré en direct.
+
+Raccourcis du puits : les étages 4, 7 et 10 se débloquent quand on les a atteints.
+
 ## Lancer
 
 ```bash
@@ -29,9 +40,10 @@ src/
   main.js            démarrage, mise à l'échelle entière, boucle à pas fixe
   config.js          résolution, taille des tuiles, durée du jour
   engine/            entrées (clavier + tactile), boucle de scènes, sauvegarde
+  audio/             bruitages et musiques chiptune (WebAudio, aucun fichier)
   gfx/               rendu : palette jour/nuit, tuiles, personnages (dessinés en code)
-  scenes/            écran titre, choix du destin, monde, dialogues et menus
-  world/             DONNÉES de l'univers : palette, zones, PNJ, destins, carnet
+  scenes/            titre, destin, monde, combat, verdicts, dialogues et menus
+  world/             DONNÉES : palette, zones, PNJ, destins, dons, monstres, donjon, règles RPG
 ```
 
 Tout le contenu se trouve dans `src/world/`. Pour ajouter une zone, un PNJ ou une

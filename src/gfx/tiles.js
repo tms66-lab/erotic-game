@@ -8,10 +8,13 @@ export function hash(x, y, s = 0) {
 }
 
 // Tuiles infranchissables.
-export const SOLID = new Set(['#', 'R', 'W', 'T', '~', 'L', 'C', 'B', 'S', 'X']);
+export const SOLID = new Set(['#', 'R', 'W', 'T', '~', 'L', 'C', 'B', 'S', 'X', 'P', 'w', 'K', 'k', 'O', 'M', 'F', 'f', 'G', 'g']);
 
 // Tuiles qui émettent de la lumière la nuit.
-export const LIGHTS = { L: { dx: 8, dy: 4, r: 26 }, W: { dx: 8, dy: 8, r: 18 } };
+export const LIGHTS = {
+  L: { dx: 8, dy: 4, r: 26 }, W: { dx: 8, dy: 8, r: 18 },
+  O: { dx: 8, dy: 6, r: 30 }, M: { dx: 8, dy: 5, r: 26 }, F: { dx: 8, dy: 8, r: 28 }, v: { dx: 8, dy: 8, r: 18 }, G: { dx: 8, dy: 4, r: 60 },
+};
 
 function grass(g, x, y, tx, ty) {
   g.rect(x, y, TILE, TILE, 'grass');
@@ -169,9 +172,95 @@ function mat(g, x, y, tx, ty) {
   g.rect(x + 3, y + 5, 10, 7, 'roof');
 }
 
+function well(g, x, y, tx, ty) {
+  grass(g, x, y, tx, ty);
+  g.disc(x + 8, y + 9, 7, 'stoneDark');
+  g.disc(x + 8, y + 9, 6, 'stone');
+  g.disc(x + 8, y + 9, 4, 'ink');
+  g.rect(x + 1, y, 2, 10, 'woodDark');
+  g.rect(x + 13, y, 2, 10, 'woodDark');
+  g.rect(x + 1, y, 14, 2, 'wood');
+  g.rect(x + 7, y + 2, 1, 4, 'stoneLight');
+}
+
+// ---------- Profondeurs (couleurs du thème de l'étage, jamais teintées) ----------
+function deep(g, ch, tx, ty, x, y, time, zone, at) {
+  const T = zone.theme;
+  const c = (k) => '!' + T[k];
+  const floorTile = () => {
+    g.rect(x, y, TILE, TILE, c('floor'));
+    if ((tx + ty) % 2) g.rect(x, y, TILE, 1, c('floorDark'));
+    for (let i = 0; i < 3; i++) g.rect(x + Math.floor(hash(tx, ty, i) * 15), y + Math.floor(hash(ty, tx, i) * 15), 1, 1, c('floorDark'));
+  };
+  const glowPulse = 0.5 + 0.5 * Math.sin(time * 2 + tx + ty);
+  switch (ch) {
+    case 'w': {
+      if (at(tx, ty + 1) !== 'w') {
+        g.rect(x, y, TILE, TILE, c('wall'));
+        for (let row = 0; row < 4; row++) {
+          g.rect(x, y + row * 4 + 3, TILE, 1, c('wallDark'));
+          const off = (row + ty) % 2 ? 0 : 5;
+          g.rect(x + off, y + row * 4, 1, 3, c('wallDark'));
+          g.rect(x + off + 8, y + row * 4, 1, 3, c('wallDark'));
+        }
+        if (hash(tx, ty) > 0.8) g.rect(x + 4, y + 2, 2, 5, c('accent'));
+      } else {
+        g.rect(x, y, TILE, TILE, c('wallTop'));
+      }
+      return;
+    }
+    case 'd': return floorTile();
+    case '^':
+      floorTile();
+      for (let i = 0; i < 4; i++) g.rect(x + 2 + i, y + 12 - i * 3, 12 - i * 2, 3, i % 2 ? c('wall') : c('wallDark'));
+      g.rect(x + 7, y, 2, 3, '!#f5e9d0');
+      return;
+    case 'v':
+      floorTile();
+      g.rect(x + 1, y + 1, 14, 14, '!#05040a');
+      for (let i = 0; i < 4; i++) g.rect(x + 2 + i * 2, y + 2 + i * 3, 12 - i * 4, 2, c('wallDark'));
+      return;
+    case 'K': case 'k':
+      floorTile();
+      g.rect(x + 2, y + 5, 12, 9, '!#4a2f2c');
+      g.rect(x + 3, y + 6, 10, 7, '!#a56a52');
+      g.rect(x + 2, y + 8, 12, 1, '!#f2c35b');
+      if (ch === 'K') { g.rect(x + 2, y + 3, 12, 3, '!#784b45'); g.rect(x + 7, y + 8, 2, 3, '!#f2c35b'); if (Math.floor(time * 2 + tx) % 4 === 0) g.px(x + 12, y + 3, '!#ffffff'); } else { g.rect(x + 2, y + 1, 12, 3, '!#784b45'); g.rect(x + 4, y + 6, 8, 3, '!#1b1424'); }
+      return;
+    case 'O':
+      floorTile();
+      g.rect(x + 6, y + 1, 4, 13, c('glow'));
+      g.rect(x + 3, y + 6, 3, 8, c('accent'));
+      g.rect(x + 10, y + 5, 3, 9, c('accent'));
+      g.rect(x + 7, y + 2, 1, 6 + Math.round(glowPulse * 3), '!#ffffff');
+      return;
+    case 'M':
+      floorTile();
+      g.rect(x + 7, y + 8, 2, 6, '!#cdc5c7');
+      g.disc(x + 8, y + 7, 5, c('accent'));
+      g.rect(x + 5, y + 5, 2, 1, '!#ffffff');
+      g.rect(x + 3, y + 11, 1, 3, '!#cdc5c7');
+      g.disc(x + 3, y + 10, 2, c('glow'));
+      return;
+    case 'F': case 'f':
+      floorTile();
+      g.disc(x + 8, y + 9, 7, c('wallDark'));
+      g.disc(x + 8, y + 9, 5, ch === 'F' ? '!#6ebbd6' : '!#241a1f');
+      if (ch === 'F') { g.rect(x + 7, y + 2, 2, 6, '!#bdcee7'); if (glowPulse > 0.5) g.px(x + 5, y + 8, '!#ffffff'); }
+      return;
+    case 'G': case 'g':
+      floorTile();
+      g.rect(x + 1, y + 12, 14, 3, '!#05040a');
+      return;
+    default: return floorTile();
+  }
+}
+
 // Dessine la tuile `ch` à l'écran (x, y). `at(tx, ty)` lit la carte pour les bords.
 export function drawTile(g, ch, tx, ty, x, y, time, zone, at) {
+  if (zone.deep) return deep(g, ch, tx, ty, x, y, time, zone, at);
   switch (ch) {
+    case 'P': return well(g, x, y, tx, ty);
     case '.': return grass(g, x, y, tx, ty);
     case ':': return path(g, x, y, tx, ty);
     case '*': return flowers(g, x, y, tx, ty);

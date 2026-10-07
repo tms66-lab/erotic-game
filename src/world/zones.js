@@ -2,7 +2,8 @@
 //  .  herbe        :  chemin       *  fleurs      ~  eau
 //  T  arbre        L  lanterne     R  toit        #  mur
 //  W  mur + fenêtre  =  plancher   C  comptoir    B  table
-//  S  panneau      X  barricade    0-9  sortie (voir `exits`)
+//  S  panneau      X  barricade    P  puits des Profondeurs
+//  0-9  sortie (voir `exits`)
 //
 // Un PNJ peut n'apparaître que le jour ou la nuit (`when`), et `talk(s)`
 // reçoit l'état de la partie pour adapter ses répliques.
@@ -27,7 +28,7 @@ export const ZONES = {
       'T....*..T:XT...*...T',
       'T.......L::L.......T',
       'T..RRRRR.::........T',
-      'T..RRRRR.::...~~~~.T',
+      'T..RRRRR.::.P.~~~~.T',
       'T..#W1W#.::..~~~~~~T',
       'T....:...::..~~~~~~T',
       'T..L.::::::...~~~~.T',
@@ -93,15 +94,13 @@ export const ZONES = {
       },
       {
         id: 'tobin', name: 'Vieux Tobin', look: LOOKS.tobin, x: 12, y: 6, dir: 'right',
-        talk: (s) => (s.night
-          ? [
-            'Chut... écoute.',
-            'Rien ? Tant mieux. Le soir où tu l\'entendras, la Cloche sous le lac aura quelque chose à te dire.',
-          ]
-          : [
-            'Quarante ans que je pêche ici. Jamais attrapé un poisson.',
-            'Mais j\'ai remonté trois clés, une couronne et une lettre adressée à moi. Datée de l\'an prochain.',
-          ]),
+        talk: (s) => {
+          if (s.flags.bell) return ['Le lac est silencieux. Je pêche enfin des poissons. C\'est décevant, en fait.', 'Merci quand même. Je dors mieux. Les poissons aussi, j\'imagine.'];
+          if (s.deepest >= 4) return ['Tu es descendu jusqu\'à l\'étage ' + s.deepest + ' ? Moi, je n\'ai jamais dépassé la troisième marche.', 'Tout en bas, il y a le Noyau. Et dans le Noyau, il y a ce qui sonne.'];
+          return s.night
+            ? ['Chut... écoute.', 'Tu l\'entends ? La Cloche. Elle sonne sous le lac. Le vieux puits mène droit à elle.', 'Dix étages. Personne n\'est jamais remonté du dixième. Enfin, personne de bavard.']
+            : ['Quarante ans que je pêche ici. Jamais attrapé un poisson.', 'Mais j\'ai remonté trois clés, une couronne et une lettre adressée à moi. Datée de l\'an prochain.', 'Le puits, là ? Il descend sous le lac. Prends des potions. Prends deux fois plus de potions.'];
+        },
       },
       {
         id: 'mousse', name: 'Mousse', look: null, kind: 'blob', x: 16, y: 8, dir: 'down',
@@ -118,11 +117,12 @@ export const ZONES = {
       },
       {
         id: 'nyx', name: 'Nyx', look: LOOKS.nyx, x: 13, y: 9, dir: 'down', when: 'night',
-        talk: (s) => [
+        talk: (s) => ({ lines: [
           'Bienvenue au marché de minuit, ' + s.fate.title + '.',
-          'Je vends des souvenirs que tu n\'as pas encore vécus. Le prix ? Un souvenir que tu as déjà.',
-          'Reviens quand tu en auras assez à échanger. Ou trop à oublier.',
+          'Je vends des souvenirs que tu n\'as pas encore vécus. Et des potions. Surtout des potions.',
+          'Paiement en or. Ou en souvenirs, mais les tiens ne valent pas grand-chose pour l\'instant.',
         ],
+        after: (st, w) => w.openShop() }),
       },
       {
         id: 'pip', name: 'Pip', look: LOOKS.pip, x: 4, y: 10, dir: 'right', when: 'day', wander: true,
@@ -156,12 +156,16 @@ export const ZONES = {
     npcs: [
       {
         id: 'maelle', name: 'Maëlle', look: LOOKS.maelle, x: 3, y: 2, dir: 'down',
-        talk: (s) => [
-          'Bienvenue à la Dernière Mèche ! Quelque part dans le Royaume, il y a toujours une lumière allumée pour toi.',
-          s.flags.mousse_joined
-            ? 'Ton ami en mousse peut rester. Mais s\'il prend racine dans le tapis, tu paies le tapis.'
-            : 'Si tu croises un petit tas de mousse qui ronfle dehors, ne le réveille pas. Il adopte les gens.',
-        ],
+        talk: (s) => ({
+          lines: [
+            'Bienvenue à la Dernière Mèche ! Quelque part dans le Royaume, il y a toujours une lumière allumée pour toi.',
+            s.flags.mousse_joined
+              ? 'Ton ami en mousse peut rester. Mais s\'il prend racine dans le tapis, tu paies le tapis.'
+              : 'Si tu croises un petit tas de mousse qui ronfle dehors, réveille-le. Dans le noir, il se bat mieux que toi.',
+            'Une chambre pour la nuit ? Ça remet sur pied. Même les gens remontés du puits.',
+          ],
+          after: (st, w) => w.offerInn(),
+        }),
       },
       {
         id: 'fifre', name: 'Fifre', look: LOOKS.fifre, x: 9, y: 4, dir: 'left', wander: true,

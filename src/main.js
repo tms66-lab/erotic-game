@@ -2,6 +2,7 @@ import { W, H } from './config.js';
 import { Input } from './engine/input.js';
 import { Game } from './engine/game.js';
 import { TitleScene } from './scenes/title.js';
+import { unlockAudio } from './audio/sound.js';
 
 const canvas = document.getElementById('game');
 const screen = document.getElementById('screen');
@@ -18,6 +19,9 @@ function fit() {
 }
 addEventListener('resize', fit);
 fit();
+
+// Les navigateurs n'autorisent le son qu'après un geste de l'utilisateur.
+for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, unlockAudio, { passive: true });
 
 const input = new Input();
 input.bindTouch();
