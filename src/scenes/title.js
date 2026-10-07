@@ -24,7 +24,7 @@ export class TitleScene {
       label: 'Nouvelle partie',
       action: () => this.game.fadeTo(() => { clearSave(); this.game.setScene(new FateScene(this.game)); }),
     });
-    this.game.push(new ListMenu(this.game, { items, x: 30, y: 180, w: W - 60 }));
+    this.game.push(new ListMenu(this.game, { items, x: 18, y: 176, w: W - 36 }));
   }
 
   tick(dt) {
