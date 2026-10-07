@@ -1,0 +1,11 @@
+{
+  "name": "Valombre",
+  "short_name": "Valombre",
+  "description": "Un RPG pixel art : chaque route a deux visages.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#140f1e",
+  "theme_color": "#140f1e",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
