@@ -938,7 +938,7 @@ function SavesView({ characters, sessions, settings, setCharacters, setSessions,
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `erotic-game-save-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `game-save-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast("Sauvegarde exportée");
@@ -1040,7 +1040,7 @@ const DEFAULT_SETTINGS = {
   imageApiFormat: "openai",
 };
 
-export default function EroticGame() {
+export default function Game() {
   const [settings, setSettings] = useState(() => loadState("settings", DEFAULT_SETTINGS));
   const [characters, setCharacters] = useState(() => loadState("characters", []));
   const [sessions, setSessions] = useState(() => loadState("sessions", []));
@@ -1065,19 +1065,19 @@ export default function EroticGame() {
       <style>{`
         @keyframes fadeUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-        .eroticgame input:focus, .eroticgame select:focus, .eroticgame textarea:focus {
+        .game input:focus, .game select:focus, .game textarea:focus {
           border-color: ${T.accent} !important;
           box-shadow: 0 0 0 2px rgba(233,69,96,0.2) !important;
           outline: none !important;
         }
-        .eroticgame ::-webkit-scrollbar { width: 6px; }
-        .eroticgame ::-webkit-scrollbar-thumb { background: ${T.border}; border-radius: 3px; }
-        .eroticgame ::-webkit-scrollbar-track { background: transparent; }
+        .game ::-webkit-scrollbar { width: 6px; }
+        .game ::-webkit-scrollbar-thumb { background: ${T.border}; border-radius: 3px; }
+        .game ::-webkit-scrollbar-track { background: transparent; }
       `}</style>
 
       <Toast msg={toast} />
 
-      <div className="eroticgame" style={{ maxWidth: 960, margin: "0 auto", padding: "0 20px" }}>
+      <div className="game" style={{ maxWidth: 960, margin: "0 auto", padding: "0 20px" }}>
         <div style={{ marginBottom: 24 }}>
           <h2 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: T.accent,
             display: "flex", alignItems: "center", gap: 10, letterSpacing: "-0.5px" }}>
