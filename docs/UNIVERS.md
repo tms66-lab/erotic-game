@@ -7,7 +7,8 @@
 Il est construit à partir de l'analyse d'un export de 100 publications du compte
 Instagram **@inner.lore** (pixel art fantasy, juillet → octobre 2026).
 Seuls les textes ont servi (légendes, hashtags, formats récurrents) : les images
-n'ont pas pu être téléchargées depuis l'environnement de développement.
+n'ont pas pu être téléchargées depuis l'environnement de développement ; quelques
+captures ont depuis été analysées, voir [`inner-lore/catalogue.md`](inner-lore/catalogue.md).
 
 Valombre est un univers **original** : il reprend l'ambiance et les mécaniques
 qui font le succès du compte, mais **aucun personnage, nom ou lieu** du compte
@@ -30,8 +31,8 @@ source (ceux-ci appartiennent à leur créateur).
 ## Direction artistique
 
 - **Résolution** 180×240 en portrait, tuiles de 16 px, agrandissement entier (pixels nets).
-- **Palette Clair** : or chaud `#f2c35b`, verts tendres, toits brique, eau azur.
-- **Palette Sombre** : la même, désaturée et tirée vers un bleu de lune `#161a42`. Les lumières (lanternes, fenêtres, interface) gardent leur éclat.
+- **Palette Clair** (extraite des captures) : ciel azur `#8ac3e5`, nuages pêche `#d79877`, toits d'ardoise bleue `#4c6487`, bois brun-prune `#784b45`, lanternes ambre `#ec9d49`.
+- **Palette Sombre** : la même, désaturée et tirée vers un bleu-pétrole `#142036` (comme les tavernes sous la pluie). Les lumières (lanternes, fenêtres, interface) gardent leur éclat.
 - **Police** : Press Start 2P.
 - **Interface** : cadres sombres bordés d'or, accent lilas `#c9a6ff` pour la narration.
 

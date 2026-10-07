@@ -3,7 +3,7 @@ import { hash } from '../gfx/tiles.js';
 
 // Décor animé de l'écran titre : ciel du crépuscule, château lointain,
 // les deux visages de Valombre (doré à gauche, lunaire à droite).
-const SKY = ['#1a1433', '#251a45', '#3a2257', '#5a2d63', '#86405f', '#b8605a', '#e08f5a', '#f2c35b'];
+const SKY = ['#1d3036', '#254d4c', '#3e7f83', '#629199', '#87757c', '#b6948a', '#d79877', '#e4b36e'];
 
 export function drawBackdrop(g, time) {
   const band = Math.ceil(170 / SKY.length);
@@ -21,22 +21,22 @@ export function drawBackdrop(g, time) {
 
   // lune
   g.disc(140, 34, 9, '!#f5e9d0');
-  g.disc(144, 31, 8, '!#251a45');
+  g.disc(144, 31, 8, '!#254d4c');
 
   // montagnes lointaines
   for (let x = 0; x < W; x++) {
     const h = 120 + Math.sin(x * 0.045) * 16 + Math.sin(x * 0.13 + 1) * 6;
-    g.rect(x, h, 1, H - h, '!#3a2a5c');
+    g.rect(x, h, 1, H - h, '!#465e74');
     if (h < 112) g.px(x, Math.round(h), '!#e8e4ff');
   }
 
   // château sur la colline
   const cx = 118;
-  g.rect(cx, 118, 30, 30, '!#241a38');
-  g.rect(cx - 4, 106, 8, 42, '!#241a38');
-  g.rect(cx + 26, 102, 8, 46, '!#241a38');
-  g.rect(cx + 11, 96, 8, 52, '!#241a38');
-  g.rect(cx + 13, 90, 4, 6, '!#241a38');
+  g.rect(cx, 118, 30, 30, '!#213e3e');
+  g.rect(cx - 4, 106, 8, 42, '!#213e3e');
+  g.rect(cx + 26, 102, 8, 46, '!#213e3e');
+  g.rect(cx + 11, 96, 8, 52, '!#213e3e');
+  g.rect(cx + 13, 90, 4, 6, '!#213e3e');
   for (const [wx, wy] of [[cx - 2, 112], [cx + 28, 108], [cx + 14, 102], [cx + 6, 128], [cx + 20, 124]]) {
     if (Math.sin(time * 1.5 + wx) > -0.8) g.rect(wx, wy, 2, 3, '!#ffcf5a');
   }
@@ -44,7 +44,7 @@ export function drawBackdrop(g, time) {
   // collines proches
   for (let x = 0; x < W; x++) {
     const h = 150 + Math.sin(x * 0.03 + 2) * 10 + Math.sin(x * 0.11) * 4;
-    g.rect(x, h, 1, H - h, '!#1f1730');
+    g.rect(x, h, 1, H - h, '!#1d3036');
   }
   // sapins en silhouette
   for (let i = 0; i < 14; i++) {

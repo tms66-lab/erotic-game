@@ -1,0 +1,36 @@
+{
+  "source": "@inner.lore (Instagram) — captures du 2026-10-07",
+  "note": "Référence d'inspiration ; contenu appartenant à son créateur.",
+  "posts": [
+    {
+      "theme": "metiers",
+      "cover": "Choose Your Fantasy Job",
+      "caption": "The Realm is hiring…",
+      "pinnedComment": "Find someone in the comments with the same job. Congratulations. You're business partners now.",
+      "slideCount": 13,
+      "likes": 63600,
+      "comments": 1077,
+      "slides": [
+        { "n": 1, "title": "Choose Your Fantasy Job", "text": null, "scene": "Étal d'alchimiste au marché, potion verte lumineuse, château sur falaise.", "view": "rue, perspective" },
+        { "n": 2, "title": "Dragon Dentist", "text": "The pay is incredible. There is a reason.", "scene": "Dragon rouge géant gueule ouverte, chevalier sur échafaudage frappant une dent, nains et outils géants.", "view": "contre-plongée depuis la gueule" },
+        { "n": 3, "title": "Pastry Chef", "text": "Fresh pastries every morning. Adventurers line up before sunrise.", "scene": "Boulangerie en plein air, pâtissier à fourrure blanche, four en pierre, pâtisseries en forme de dragon, créatures qui chapardent.", "view": "plongée légère" },
+        { "n": 4, "title": "Tavern Keeper", "text": "Good food. Better stories. You know everyone in town.", "scene": "Taverne de nuit, pluie sur une ville bleutée, comptoir, cheminée, bardes, chevalier.", "view": "isométrique" }
+      ]
+    },
+    {
+      "theme": "elements",
+      "cover": "Earth gets ONE new element. You decide which one.",
+      "caption": "The old table was never complete…",
+      "pinnedComment": "Those interested in Nullium… You may want to take a second look at the Nu slide.",
+      "slideCount": 11,
+      "likes": 21500,
+      "comments": 872,
+      "slides": [
+        { "n": 1, "title": "Earth gets ONE new element. You decide which one.", "text": null, "scene": "Silhouette encapuchonnée avec un tableau périodique lumineux, crépuscule, île flottante, étoiles filantes.", "view": "paysage" },
+        { "n": 2, "title": "Aetherium [Ae]", "text": "Manipulates gravity. Flight just became possible.", "scene": "Cristal cyan, îlots flottants, chevalier en lévitation, navire volant.", "view": "4 vignettes" },
+        { "n": 3, "title": "Chronite [Ch]", "text": "Break it to rewind time. You choose how far back.", "scene": "Disque ambré en anneaux qui se brise, arbre des quatre saisons, flèches figées, ruines dorées.", "view": "4 vignettes" },
+        { "n": 4, "title": "Mendrium [Me]", "text": "Regenerates anything living. Wounds heal. Forests regrow.", "scene": "Cristal vert veiné d'où poussent des fleurs, forêt luxuriante, soin d'un chevalier, aqueduc envahi de végétation.", "view": "4 vignettes" }
+      ]
+    }
+  ]
+}

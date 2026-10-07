@@ -1,7 +1,7 @@
 // Passage jour -> nuit : chaque couleur est désaturée puis tirée vers un bleu
 // de lune. Les couleurs « lumineuses » (lanternes, fenêtres) y échappent.
 export const NIGHT_STEPS = 8;
-const NIGHT = [22, 26, 66];
+const NIGHT = [20, 32, 54]; // nuit bleu-pétrole, comme les scènes de pluie nocturne
 const cache = new Map();
 
 export function hexToRgb(hex) {
