@@ -7,7 +7,8 @@ L'univers est décrit dans [`docs/UNIVERS.md`](docs/UNIVERS.md).
 
 ## Le jeu
 
-1. **Choisis ton mois de naissance** : il te donne un titre, un don et ton **attaque spéciale** en combat (12 différentes).
+1. **Choisis ton mois de naissance** : ton identité. Il donne un titre, une chance (★) et un **Signe**, bonus passif permanent (lumière, esquive, or, boussole…).
+   Ce qui change à chaque partie : à chaque descente, un **Présage** est tiré (la chance pèse sur le tirage) et tu **choisis 1 don de combat parmi 3** aux étages 1, 4 et 7.
 2. **Halte-Lanterne** : village avec cycle jour/nuit. La nuit, Nyx tient boutique. L'auberge de Maëlle soigne (10 or).
 3. **Le vieux puits** descend dans **les Profondeurs** : 10 étages générés au hasard (Racines, Forêt-Champignon, Cavernes de Cristal), dans le noir, avec coffres, fontaines bénies ou maudites, et 9 monstres + 1 rare.
 4. **Combats au tour par tour avec timing** : vise le centre de la jauge pour un coup parfait, appuie sur A au « ! » pour parer.

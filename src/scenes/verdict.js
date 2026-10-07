@@ -5,6 +5,7 @@ const KINDS = {
   VIT: { label: 'VIT', color: '#3fae5a' },
   MEURT: { label: 'MEURT', color: '#d9534f' },
   MAUDIT: { label: 'MAUDIT', color: '#9b59d0' },
+  PRESAGE: { label: 'PRÉSAGE', color: '#c49a2c' },
 };
 
 // Carte de verdict plein écran : VIT / MEURT / MAUDIT.

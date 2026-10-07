@@ -7,6 +7,7 @@ import { SKILLS } from '../world/skills.js';
 import { ITEMS, maxHp, maxMp, atk, def, gainXp } from '../world/rpg.js';
 import { THEMES } from '../world/dungeon.js';
 import { strataOf } from '../world/monsters.js';
+import { OMENS } from '../world/omens.js';
 import { sfx, playMusic } from '../audio/sound.js';
 import { ListMenu } from './ui.js';
 
@@ -24,7 +25,9 @@ export class Battle {
     this.boss = !!enemy.boss;
     this.onEnd = onEnd;
     this.theme = THEMES[Math.max(0, strataOf(floor))];
-    this.skill = SKILLS[this.s.month];
+    this.dons = this.s.run?.dons || [];
+    this.mods = this.s.fate.mods || {};
+    this.omen = OMENS[this.s.run?.omen] || {};
     this.q = [];
     this.mode = 'queue';
     this.log = '';
@@ -111,7 +114,10 @@ export class Battle {
   hitEnemy(mult, o = {}) {
     this.then(() => {
       const crit = !!o.crit || (this.critTurns > 0 && !o.fixed);
-      const dmg = o.fixed ?? Math.max(1, Math.round(atk(this.s) * this.atkMul * mult * rand(0.9, 1.1) * (crit ? 1.6 : 1)));
+      let m = mult * this.atkMul * (crit ? 1.6 : 1);
+      if (this.e.id === 'glas' && this.mods.bell) m *= this.mods.bell;
+      if (this.mods.lowHp && this.s.hp < this.maxHp() * 0.3) m *= this.mods.lowHp;
+      const dmg = o.fixed ?? Math.max(1, Math.round(atk(this.s) * m * rand(0.9, 1.1)));
       this.e.hp = Math.max(0, this.e.hp - dmg);
       this.eFlash = 0.22;
       this.shake = crit || o.big ? 7 : 3;
@@ -119,6 +125,10 @@ export class Battle {
       this.burst(90, 75, o.color || '#ffffff', crit || o.big ? 22 : 10);
       sfx(crit || o.big ? 'crit' : 'hit');
       if (crit) this.say('CRITIQUE !', 0.7);
+      if (this.mods.burn && !o.fixed && this.e.hp > 0 && Math.random() < this.mods.burn) {
+        this.e.burn = Math.max(this.e.burn, 2);
+        this.floater('FEU', 120, 70, '#ec9d49');
+      }
     });
     this.wait(0.3);
   }
@@ -147,19 +157,28 @@ export class Battle {
     if (i === 0) {
       this.q.push({ mode: 'aim' });
     } else if (i === 1) {
-      const sk = this.skill;
-      if (s.mp < sk.cost) { this.say('Pas assez d\'Éclat. Il en faut ' + sk.cost + '.', 1.2); return; }
-      s.mp -= sk.cost;
-      this.say(sk.name + ' !', 0.8);
-      sk.use(this);
-      this.endPlayerTurn();
+      if (!this.dons.length) { this.say('Tu n\'as aucun don. Ils se trouvent dans les Profondeurs.', 1.3); return; }
+      if (this.dons.length === 1) { this.useSkill(this.dons[0]); return; }
+      this.game.push(new ListMenu(this.game, {
+        title: 'DONS', x: 8, y: 110, w: W - 16,
+        items: this.dons.map((id) => ({ label: SKILLS[id].name.slice(0, 15) + ' ' + SKILLS[id].cost, action: () => this.useSkill(id) })),
+      }));
     } else if (i === 2) {
       this.openBag();
     } else {
       if (this.boss) { this.say('Le Glas ne laisse partir personne.', 1.3); this.endPlayerTurn(true); return; }
-      if (Math.random() < 0.65) this.flee();
+      if (Math.random() < (this.mods.flee || 0.65)) this.flee();
       else { this.say('Tu glisses. Fuite ratée. Le monstre a tout vu.', 1.3); this.endPlayerTurn(true); }
     }
+  }
+
+  useSkill(id) {
+    const sk = SKILLS[id];
+    if (this.s.mp < sk.cost) { this.say('Pas assez d\'Éclats. Il en faut ' + sk.cost + '.', 1.2); return; }
+    this.s.mp -= sk.cost;
+    this.say(sk.name + ' !', 0.8);
+    sk.use(this);
+    this.endPlayerTurn();
   }
 
   openBag() {
@@ -191,7 +210,7 @@ export class Battle {
   resolveAim(p) {
     const d = Math.abs(p - 0.5);
     this.mode = 'queue';
-    if (d < 0.06) { this.say('PARFAIT !', 0.6); this.hitEnemy(1.8, { crit: true }); } else if (d < 0.2) this.hitEnemy(1); else { this.say('Pas terrible.', 0.6); this.hitEnemy(0.55); }
+    if (d < 0.06 * (this.mods.perfect || 1)) { this.say('PARFAIT !', 0.6); this.hitEnemy(1.8, { crit: true }); } else if (d < 0.2) this.hitEnemy(1); else { this.say('Pas terrible.', 0.6); this.hitEnemy(0.55); }
     this.endPlayerTurn();
   }
 
@@ -212,7 +231,7 @@ export class Battle {
   mousseTurn() {
     if (this.e.id === 'caillou') { this.say('Mousse refuse de frapper le caillou. C\'est son ami.', 1.3); return; }
     const r = Math.random();
-    if (r < 0.45) { this.say('Mousse lance un caillou. Pas celui-là, un autre.', 1); this.hitEnemy(0, { fixed: 2 + Math.floor(this.s.lvl * 0.8 + Math.random() * 3), color: '#78c47d' }); } else if (r < 0.7) { this.say('Mousse te tend une fleur. Ça soigne, apparemment.', 1.1); this.healPlayer(4 + this.s.lvl * 2); } else this.say('Mousse fait une sieste. Il est très doué pour ça.', 1);
+    if (r < 0.45) { this.say('Mousse lance un caillou. Pas celui-là, un autre.', 1); this.hitEnemy(0, { fixed: Math.round((2 + Math.floor(this.s.lvl * 0.8 + Math.random() * 3)) * (this.omen.mousse || 1)), color: '#78c47d' }); } else if (r < 0.7) { this.say('Mousse te tend une fleur. Ça soigne, apparemment.', 1.1); this.healPlayer(Math.round((4 + this.s.lvl * 2) * (this.omen.mousse || 1))); } else this.say('Mousse fait une sieste. Il est très doué pour ça.', 1);
   }
 
   // ---------- tour de l'ennemi ----------
@@ -247,9 +266,10 @@ export class Battle {
     this.mode = 'queue';
     this.lunge = 0.3;
     let dmg = Math.max(1, Math.round(this.e.atk * move.power * rand(0.85, 1.15)) - def(s));
-    if (this.dodge) {
+    if (this.dodge || (this.mods.dodge && Math.random() < this.mods.dodge)) {
       this.dodge = false;
       dmg = 0;
+      this.floater('ESQUIVE', 90, 120, '#cdc5c7', true);
       this.say('Tu n\'es plus là. Le coup traverse la brume.', 1);
     } else if (res === 'parry') {
       dmg = Math.ceil(dmg * 0.25);
@@ -276,17 +296,18 @@ export class Battle {
     const s = this.s;
     this.eDead = 0.001;
     sfx('win');
-    const gold = Math.round(rand(e.gold[0], e.gold[1] + 0.99));
+    const gold = Math.round(rand(e.gold[0], e.gold[1] + 0.99) * (this.mods.gold || 1) * (this.omen.gold || 1));
+    const xp = Math.round(e.xp * (this.omen.xp || 1));
     s.gold += gold;
     s.kills++;
     this.say(e.name + ' est vaincu !', 1.2);
-    this.say('+' + e.xp + ' XP     +' + gold + ' or', 1.4);
-    if (!e.boss && Math.random() < 0.18) {
+    this.say('+' + xp + ' XP     +' + gold + ' or', 1.4);
+    if (!e.boss && Math.random() < (this.omen.drop || 0.18)) {
       const k = Math.random() < 0.7 ? 'potion' : 'meche';
       s.items[k] = (s.items[k] || 0) + 1;
       this.say('Il laisse tomber : ' + ITEMS[k].name + '. Encore tiède.', 1.3);
     }
-    for (const line of gainXp(s, e.xp)) {
+    for (const line of gainXp(s, xp)) {
       this.then(() => { sfx('levelup'); this.burst(40, 135, '#f2c35b', 30); });
       this.say(line, 2.2);
     }
@@ -359,7 +380,7 @@ export class Battle {
     if (this.mode !== 'menu') return this.log;
     return [
       'Attaque. Vise le centre pour un coup parfait.',
-      this.skill.name + ' (' + this.skill.cost + ' Éclats) : ' + this.skill.desc,
+      this.dons.length ? 'Dons : ' + this.dons.map((id) => SKILLS[id].name).join(', ') + '.' : 'Aucun don pour l\'instant.',
       'Ton sac. Il sent un peu le fromage.',
       this.boss ? 'Fuir ? Il n\'y a nulle part où aller.' : 'Une retraite stratégique. Ou pas.',
     ][this.cursor];

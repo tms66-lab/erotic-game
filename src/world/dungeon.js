@@ -50,7 +50,7 @@ function bfs(map, sx, sy) {
   return dist;
 }
 
-export function makeFloor(n, seed = Math.random() * 1e9) {
+export function makeFloor(n, omen = {}, seed = Math.random() * 1e9) {
   const si = strataOf(n);
   const theme = THEMES[si];
   const base = {
@@ -63,7 +63,7 @@ export function makeFloor(n, seed = Math.random() * 1e9) {
     },
     npcs: [],
     items: [],
-    encounter: n === 10 ? 0 : 0.11,
+    encounter: n === 10 ? 0 : 0.11 * (omen.enc || 1),
   };
 
   if (n === 10) {
@@ -102,6 +102,7 @@ export function makeFloor(n, seed = Math.random() * 1e9) {
   for (const r of rooms) if (dist[r.cy][r.cx] > dist[end.cy][end.cx]) end = r;
   map[start.cy][start.cx] = '^';
   map[end.cy][end.cx] = 'v';
+  base.down = [end.cx, end.cy];
 
   // décor et coffres, à l'intérieur des salles (la bordure reste libre)
   const deco = si === 0 ? 'M' : si === 1 ? 'M' : 'O';
@@ -109,9 +110,9 @@ export function makeFloor(n, seed = Math.random() * 1e9) {
     const spots = [];
     for (let yy = r.y + 1; yy < r.y + r.h - 1; yy++) for (let xx = r.x + 1; xx < r.x + r.w - 1; xx++) if (map[yy][xx] === 'd' && !(xx === r.cx && (yy === r.cy || yy === r.cy + 1))) spots.push([xx, yy]);
     const take = () => spots.splice(Math.floor(R() * spots.length), 1)[0];
-    if (spots.length && R() < 0.55 && r !== start) { const [x, y] = take(); map[y][x] = 'K'; }
+    if (spots.length && R() < Math.min(0.95, 0.55 * (omen.chest || 1)) && r !== start) { const [x, y] = take(); map[y][x] = 'K'; }
     if (spots.length && R() < 0.6) { const [x, y] = take(); map[y][x] = deco; }
-    if (spots.length && R() < 0.12 && r !== start && n > 1) { const [x, y] = take(); map[y][x] = 'F'; }
+    if (spots.length && R() < Math.min(0.8, 0.12 * (omen.fountain || 1)) && r !== start && n > 1) { const [x, y] = take(); map[y][x] = 'F'; }
   }
 
   return { ...base, map, spawn: [start.cx, start.cy + 1, 'down'] };

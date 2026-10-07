@@ -5,7 +5,6 @@ import { hash } from '../gfx/tiles.js';
 import { FATES } from '../world/fates.js';
 import { Dialogue, ListMenu } from './ui.js';
 import { World } from './world.js';
-import { SKILLS } from '../world/skills.js';
 import { sfx } from '../audio/sound.js';
 
 // « Trouve ton mois. Accepte ton destin. Pas de reroll. »
@@ -43,7 +42,9 @@ export class FateScene {
     const month = this.index;
     const fate = FATES[month];
     this.game.push(new Dialogue(this.game, [
+      { who: fate.gift, text: fate.text },
       { who: '', text: 'Pas de reroll. Pas de changement de mois.' },
+      { who: '', text: 'Ton signe ne changera jamais. Tes dons, eux, changeront à chaque descente.' },
       { who: '', text: 'Le Royaume se souviendra de toi, ' + fate.title + '.' },
     ], {
       onDone: () => this.game.fadeTo(() => {
@@ -82,18 +83,16 @@ export class FateScene {
     y += 4;
     for (let i = 0; i < 5; i++) drawStar(g, W / 2 - 34 + i * 14, y, i < f.luck);
     y += 14;
-    g.text('Don :', 16, y, 'uiDim');
+    g.text('Signe :', 16, y, 'uiDim');
     y += 11;
     g.text(f.gift, 16, y, 'uiAccent');
-    y += 11;
-    g.text('Combat :', 16, y, 'uiDim');
-    y += 11;
-    g.text(SKILLS[this.index].name, 16, y, 'uiBorder');
     y += 14;
-    for (const line of wrap(f.text, 19)) {
-      g.text(line, 16, y, 'uiText');
-      y += 10;
+    for (const line of wrap(f.sign, 19)) {
+      g.text(line, 16, y, 'uiBorder');
+      y += 11;
     }
+    g.text('Les dons changent', 16, 203, 'uiDim');
+    g.text('à chaque descente.', 16, 213, 'uiDim');
 
     if (!this.game.overlays.length && Math.floor(this.time * 2) % 2 === 0) {
       g.text('A : ACCEPTER', W / 2, 230, 'uiText', { align: 'center' });

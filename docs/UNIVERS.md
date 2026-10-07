@@ -103,3 +103,11 @@ Rare partout : *Un caillou*. Il ne fait rien. Il rapporte beaucoup d'XP. Mousse 
 
 Le Glas est la Cloche sous le lac. Son œil est ouvert depuis mille ans. À mi-vie, il sonne le treizième coup.
 Le don de Novembre (Clé sans serrure) y trouve enfin sa serrure.
+
+## Signe, Présages et dons
+
+Le mois de naissance ne verrouille pas la partie, il donne une **identité** :
+
+- **Signe** (permanent) : un bonus passif par mois. Par exemple, Juin a une zone de coup parfait deux fois plus large, Septembre une flèche vers l'escalier, Novembre des dégâts x2 contre le Glas.
+- **Présage** (tiré à chaque descente) : Nuit calme, Festin des Racines, Mille sources, Mousse en forme, Brume épaisse, Pluie d'or, Le Glas t'attend, Lune rouge. Plus la chance (★) est haute, plus les bons Présages sortent souvent.
+- **Dons** (tirés à chaque descente) : « choisis-en un parmi trois » aux étages 1, 4 et 7, parmi 12 dons de combat. Ils sont perdus à la remontée.

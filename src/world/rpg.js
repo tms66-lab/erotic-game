@@ -8,7 +8,7 @@ export const ITEMS = {
 
 export const maxHp = (s) => 24 + (s.lvl - 1) * 7 + (s.bonusHp || 0);
 export const maxMp = (s) => 3 + Math.floor((s.lvl - 1) / 2);
-export const atk = (s) => 5 + (s.lvl - 1) * 2;
+export const atk = (s) => 5 + (s.lvl - 1) * 2 + (s.fate?.mods?.atk || 0);
 export const def = (s) => Math.max(0, 1 + Math.floor((s.lvl - 1) * 1.2) - (s.flags.cursed ? 1 : 0));
 export const xpNext = (lvl) => Math.round(12 * Math.pow(lvl, 1.6));
 

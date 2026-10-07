@@ -15,6 +15,8 @@ import { makeFloor, THEMES } from '../world/dungeon.js';
 import { rollMonster, makeMonster } from '../world/monsters.js';
 import { ITEMS, initRpg, fullHeal, maxHp, maxMp, atk, def, xpNext } from '../world/rpg.js';
 import { SKILLS } from '../world/skills.js';
+import { OMENS, rollOmen } from '../world/omens.js';
+import { DonDraft } from './draft.js';
 import { sfx, playMusic, isMuted, setMuted } from '../audio/sound.js';
 
 const WALK_SPEED = 4.5; // tuiles / seconde
@@ -73,7 +75,7 @@ export class World {
   }
 
   loadZone(id) {
-    if (id.startsWith('deep:')) return makeFloor(Number(id.slice(5)));
+    if (id.startsWith('deep:')) return makeFloor(Number(id.slice(5)), OMENS[this.s.run?.omen] || {});
     return ZONES[id];
   }
 
@@ -105,6 +107,7 @@ export class World {
     this.zoneId = zoneId;
     this.zoneObj = this.loadZone(zoneId);
     if (x == null) [x, y, dir] = this.zoneObj.spawn;
+    if (!this.zoneObj.deep) this.s.run = null;
     if (this.zoneObj.deep) {
       this.s.deepest = Math.max(this.s.deepest, this.zoneObj.floor);
       if (this.zoneObj.floor === 10 && this.s.flags.bell) this.zoneObj.map[2][6] = 'g';
@@ -159,6 +162,7 @@ export class World {
     this.banner = Math.max(0, this.banner - dt);
 
     for (const n of this.npcs) this.updateNpc(n, dt);
+    if (this.zone.deep && !this.player.moving && this.checkRun()) return;
     this.updatePlayer(dt);
   }
 
@@ -271,8 +275,41 @@ export class World {
     return true;
   }
 
+  // Une descente = un « run » : présage + dons tirés aux étages 1, 4 et 7.
+  newRun() {
+    const s = this.s;
+    s.run = { omen: rollOmen(s.fate.luck, !!s.flags.mousse_joined), dons: [], picked: [] };
+    if (s.fate.mods.plume) s.items.plume = (s.items.plume || 0) + 1;
+    return s.run;
+  }
+
+  checkRun() {
+    const s = this.s;
+    if (!s.run) this.newRun();
+    const pending = [1, 4, 7].filter((f) => f <= this.zone.floor && !s.run.picked.includes(f));
+    if (!pending.length) return false;
+    const f = pending[0];
+    const total = [1, 4, 7].filter((x) => x <= this.zone.floor).length;
+    this.game.push(new DonDraft(this.game, {
+      owned: s.run.dons,
+      pick: s.run.picked.length + 1,
+      total,
+      onPick: (id) => {
+        s.run.dons.push(id);
+        s.run.picked.push(f);
+        this.persist();
+        this.say([{ who: SKILLS[id].name, text: 'Ce don t\'accompagne jusqu\'à ta remontée. ' + SKILLS[id].desc }]);
+      },
+    }));
+    return true;
+  }
+
   maybeEncounter() {
     const z = this.zone;
+    if (z.deep && this.s.fate.mods.regen) {
+      this.regenSteps = (this.regenSteps || 0) + 1;
+      if (this.regenSteps % 5 === 0) this.s.hp = Math.min(maxHp(this.s), this.s.hp + 1);
+    }
     if (!z.encounter) return false;
     this.steps++;
     if (this.steps < 5 || Math.random() > z.encounter) return false;
@@ -282,6 +319,11 @@ export class World {
   }
 
   startBattle(enemy) {
+    const o = OMENS[this.s.run?.omen];
+    if (o && !enemy.boss) {
+      enemy.hp = enemy.maxHp = Math.round(enemy.hp * (o.hp || 1));
+      enemy.atk = Math.round(enemy.atk * (o.atk || 1));
+    }
     sfx('encounter');
     this.flash = 0.5;
     const floor = this.zone.floor || 1;
@@ -362,7 +404,7 @@ export class World {
   openChest(x, y) {
     const s = this.s;
     this.zone.map[y][x] = 'k';
-    const gold = Math.round((5 + Math.floor(Math.random() * 10 * this.zone.floor)) * (s.flags.cursed ? 1.5 : 1));
+    const gold = Math.round((5 + Math.floor(Math.random() * 10 * this.zone.floor)) * (s.flags.cursed ? 1.5 : 1) * (s.fate.mods.gold || 1) * (OMENS[s.run?.omen]?.gold || 1));
     s.gold += gold;
     const lines = [{ who: '', text: 'Le coffre contient ' + gold + ' pièces d\'or. Et une odeur de vieux.' }];
     const r = Math.random();
@@ -412,21 +454,24 @@ export class World {
 
   goDeep(n) {
     sfx('stairs');
+    const run = this.newRun();
+    const o = OMENS[run.omen];
     this.game.fadeTo(() => {
       this.enter('deep:' + n);
       this.persist();
-      this.onEnterZone();
+      this.game.push(new Verdict(this.game, { kind: 'PRESAGE', title: o.name, text: o.text, onDone: () => this.onEnterZone() }));
     });
   }
 
   openShop() {
     const s = this.s;
+    const price = (it) => Math.round(it.price * (s.fate.mods.shop || 1));
     const make = () => Object.entries(ITEMS).map(([k, it]) => ({
-      label: it.name + ' ' + it.price + 'or',
+      label: it.name + ' ' + price(it) + 'or',
       close: false,
       action: () => {
-        if (s.gold < it.price) { sfx('cancel'); return; }
-        s.gold -= it.price;
+        if (s.gold < price(it)) { sfx('cancel'); return; }
+        s.gold -= price(it);
         s.items[k] = (s.items[k] || 0) + 1;
         sfx('coin');
         menu.title = 'Or : ' + s.gold;
@@ -517,12 +562,16 @@ export class World {
           label: 'Destin',
           action: () => {
             const f = this.s.fate;
-            const sk = SKILLS[this.s.month];
-            this.say([
+            const run = this.s.run;
+            const lines = [
               { who: f.month, text: f.title + '. Chance : ' + f.luck + '/5.' },
-              { who: 'Don', text: f.gift + '. ' + f.text },
-              { who: sk.name, text: 'En combat (' + sk.cost + ' Éclats) : ' + sk.desc },
-            ]);
+              { who: 'Signe', text: f.gift + ' : ' + f.sign },
+            ];
+            if (run) {
+              lines.push({ who: 'Présage', text: OMENS[run.omen].name + '. ' + OMENS[run.omen].text });
+              lines.push({ who: 'Dons', text: run.dons.length ? run.dons.map((id) => SKILLS[id].name).join(', ') + '.' : 'Aucun pour l\'instant.' });
+            } else lines.push({ who: 'Dons', text: 'Tes dons se tirent à chaque descente dans le puits.' });
+            this.say(lines);
           },
         },
         { label: 'Son : ' + (isMuted() ? 'non' : 'oui'), action: () => setMuted(!isMuted()) },
@@ -657,8 +706,7 @@ export class World {
     f.fillStyle = `rgba(${T.fog.join(',')},0.84)`;
     f.fillRect(0, 0, W, H);
     f.globalCompositeOperation = 'destination-out';
-    const m = this.s.month;
-    const pr = 54 + (m === 0 || m === 9 ? 18 : 0) + Math.sin(this.time * 6) * 1.5;
+    const pr = (54 + (this.s.fate.mods.light || 0)) * (OMENS[this.s.run?.omen]?.light || 1) + Math.sin(this.time * 6) * 1.5;
     const all = [...lights, [plx, ply, pr]];
     for (const [lx, ly, r] of all) {
       for (const k of [1, 0.8, 0.62, 0.45]) {
@@ -686,6 +734,20 @@ export class World {
     g.panel(W - 22, 4, 18, 18);
     if (this.zone.deep) g.text(String(this.zone.floor), W - 13, 9, 'uiBorder', { align: 'center' });
     else drawSunMoon(g, W - 17, 9, night);
+    if (this.zone.deep && this.s.fate.mods.compass && this.zone.down) {
+      const [px, py] = this.pos(this.player);
+      const [cx, cy] = this.camera();
+      const dx = this.zone.down[0] * TILE - px;
+      const dy = this.zone.down[1] * TILE - py;
+      const d = Math.hypot(dx, dy);
+      if (d > TILE) {
+        const r = 22 + Math.sin(this.time * 5) * 2;
+        const ax = px - cx + 8 + (dx / d) * r;
+        const ay = py - cy + 8 + (dy / d) * r;
+        g.disc(ax, ay, 2, '!#f2c35b');
+        g.disc(ax + (dx / d) * 3, ay + (dy / d) * 3, 1, '!#fff4c2');
+      }
+    }
     if (this.banner <= 0) {
       g.panel(4, 4, 76, 18);
       g.rect(9, 10, 3, 3, '!#d9534f'); g.rect(13, 10, 3, 3, '!#d9534f'); g.rect(10, 13, 5, 2, '!#d9534f'); g.px(12, 15, '!#d9534f');
